@@ -8,5 +8,5 @@ module.exports = {
     dbConfigFilename: dbConfigFilename,
     dbHostInformationFilename: dbHostInformationFilename,
     projectRoot: __dirname,
-    port: 8088 
+    port: 8089 
 };
