@@ -1,0 +1,38 @@
+# global ignore file
+
+# Ignore temporary files (left by editors and OS)
+*~
+*.bak
+*.swp
+.DS_Store
+#
+# Ignore by common IDEs used directories/files
+nbproject
+*.idea
+*.project
+.buildpath
+.settings
+.TemporaryItems
+.webprj
+#
+# Temporary files and folders
+.cache
+.php_cs.cache
+.sass-cache
+.session
+*.log
+dist
+#
+# Ignore build stuff
+/build/*
+/node_modules/
+# App specific files
+/getProductionData.sh
+/test/db*
+/db*
+
+/powershell/script_root/scripts/demo
+/powershell/script_root/scripts/
+/powershell/script_root/config.ps1
+deploy.sh
+/config

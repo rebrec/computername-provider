@@ -1,0 +1,26 @@
+{% extends "parent.html" %}
+
+{% block specific_js %}
+<script type="text/javascript">
+//    let scriptSettings = {{ settings | safe }};
+</script>
+<script src="/js/settings.js"></script>
+{% endblock %}
+
+{% block container %}
+<div class="row">
+    <label for="settings-template-string" class="col-md-6">Template String</label>
+    <input type="text" class="col-md-6" id="settings-template-string"></input>
+</div>
+<div class="row">
+    <label class="col-md-6" for="settings-counter">Counter :</label>
+    <input type="text" class="col-md-6" id="settings-counter"></input>
+</div>
+<div class="row" >
+    <button class="col-md-12" id="settings-button-update-template">Update</button>
+</div>
+<div class="row" >
+    <div class="col-md-12" id="settings-errorBox"></div>
+</div>
+{% endblock %}
+
