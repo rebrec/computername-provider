@@ -5,7 +5,7 @@ param(
 
 $API_PROTOCOL 	= 'http'
 $API_HOST 		= 'localhost'
-$API_PORT 		= 8088
+$API_PORT 		= 8089
 $API_ENDPOINT	= 'api'
 
 
