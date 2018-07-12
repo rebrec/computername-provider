@@ -1,14 +1,15 @@
 module.exports = function (db) {
-
+    const EventEmitter = require('events');
     const Promise = require('bluebird');
     const config = require('../../config');
-    const NameProviderConfig = require(config.projectRoot + '/app/models/NameProviderConfig')(db);
+    const ApplicationSettings = require(config.projectRoot + '/app/models/ApplicationSettings')(db);
     const HostInformation = require(config.projectRoot + '/app/models/HostInformation')(db);
 
 
-    class NameProvider {
+    class NameProvider extends EventEmitter{
         constructor() {
-            this.config = new NameProviderConfig();
+            super();
+            this.config = new ApplicationSettings();
             this.hostInfo = new HostInformation();
         }
 
@@ -18,7 +19,15 @@ module.exports = function (db) {
 
 
         updateHostInformation(infos) {
-            return this.hostInfo.updateHostInformation(infos);
+            return this.hostInfo.updateHostInformation(infos)
+                .then(res=>{
+                    this.emit('updateSuccess', infos);
+                    return res;
+                })
+                .catch(err=>{
+                    this.emit('updateFailure', infos, err);
+                    throw err;
+                });
         }
 
         getHostnameForInfos(infos) {
@@ -34,6 +43,9 @@ module.exports = function (db) {
                             .then(hostname=> {
                                 infos.hostname = hostname;
                                 return this.hostInfo.addHostInformation(infos)
+                                    .then(_=>{
+                                        this.emit('hostCreated', infos);
+                                    })
                             })
                     }
                 })

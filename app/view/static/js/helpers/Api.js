@@ -45,5 +45,25 @@ class Api {
             type: 'PUT',
             data: data
         });
+        
+        
+    }
+    getGlpiSettings() {
+        let url = this._config.apiGetGlpiSettingsURL;
+        return new Promise((resolve, reject) =>{
+            $.getJSON(url, data => {
+                if (data.status !== 'success')      return reject('Failed to fetch url : ' + JSON.stringify(data));
+                // if (typeof data.data.length !== 'number')   return reject('Retrieved data is not an Array! (no length property)');
+                return resolve(data.data);
+            });
+        });    }
+    setGlpiSettings(settings) {
+        let data = {};
+        let url = this._config.apiSetGlpiSettingsURL;
+        return $.ajax({
+            url: url,
+            type: 'PUT',
+            data: settings
+        });
     }
 }

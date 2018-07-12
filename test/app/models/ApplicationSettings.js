@@ -5,21 +5,21 @@ const chaiHttp = require('chai-http');
 const expect = chai.expect;
 
 const config = require('../../../config');
-const NameProviderConfigFactory = require(config.projectRoot + '/app/models/NameProviderConfig');
+const ApplicationSettingsFactory = require(config.projectRoot + '/app/models/ApplicationSettings');
 
 
 chai.use(chaiHttp);
 
 
-describe('NameProviderConfig', function () {
+describe('ApplicationSettings', function () {
 
     beforeEach(helper.beforeTest);
     afterEach(helper.afterTest);
 
     it('getTemplateString return a non empty string', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
-        nameProviderConfig.getTemplateString()
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
+        applicationSettings.getTemplateString()
             .then(res=>{
                 expect(res).not.to.be.equal(null);
                 expect(res).to.be.a('string');
@@ -29,21 +29,21 @@ describe('NameProviderConfig', function () {
     });
 
     it('setTemplateString reject empty value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
-        nameProviderConfig.setTemplateString()
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
+        applicationSettings.setTemplateString()
             .catch(err=>{
                 expect(err).to.be.equal("Used setTemplateString with an empty value !");
                 done();
             });
     });
     it('setTemplateString overwrite existing value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
         let newName = 'PC1234';
-        nameProviderConfig.setTemplateString(newName)
+        applicationSettings.setTemplateString(newName)
             .then(_=>{
-                nameProviderConfig.getTemplateString()
+                applicationSettings.getTemplateString()
                     .then(res=>{
                     expect(res).to.be.equal(newName);
                     done();
@@ -52,10 +52,10 @@ describe('NameProviderConfig', function () {
     });
 
     it('getCounter return the current counter value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
         let newName = 'PC1234';
-        nameProviderConfig.getCounter()
+        applicationSettings.getCounter()
             .then(res=>{
                 expect(res).to.be.a('number');
                 expect(res).to.be.equal(3);
@@ -64,18 +64,18 @@ describe('NameProviderConfig', function () {
     });
 
     it('setCounter reject empty value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
-        nameProviderConfig.setCounter()
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
+        applicationSettings.setCounter()
             .catch(err=>{
                 expect(err).to.be.equal("Used setCounter with an empty value !");
                 done();
             });
     });
     it('setCounter reject non int value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
-        nameProviderConfig.setCounter('aze')
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
+        applicationSettings.setCounter('aze')
             .catch(err=>{
                 expect(err).to.be.equal("Used setCounter with a non int value !");
                 done();
@@ -83,12 +83,12 @@ describe('NameProviderConfig', function () {
     });
 
     it('setCounter(value) set the counter to value', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
         let value = 123;
-        nameProviderConfig.setCounter(123)
+        applicationSettings.setCounter(123)
             .then(_=>{
-                nameProviderConfig.getCounter()
+                applicationSettings.getCounter()
                     .then(res=>{
                         expect(res).to.be.equal(value);
                         done();
@@ -97,12 +97,12 @@ describe('NameProviderConfig', function () {
     });
 
     it('incCounter increment the counter by 1 by default', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
         let initialValue = 3;
-        nameProviderConfig.incCounter()
+        applicationSettings.incCounter()
             .then(_=>{
-                nameProviderConfig.getCounter()
+                applicationSettings.getCounter()
                     .then(res=>{
                         expect(res).to.be.equal(initialValue + 1);
                         done();
@@ -110,13 +110,13 @@ describe('NameProviderConfig', function () {
             });
     });
     it('incCounter(X) increment the counter by X', function (done) {
-        const NameProviderConfig= NameProviderConfigFactory(helper.db);
-        let nameProviderConfig = new NameProviderConfig();
+        const ApplicationSettings= ApplicationSettingsFactory(helper.db);
+        let applicationSettings = new ApplicationSettings();
         let initialValue = 3;
         let x = 10
-        nameProviderConfig.incCounter(x)
+        applicationSettings.incCounter(x)
             .then(_=>{
-                nameProviderConfig.getCounter()
+                applicationSettings.getCounter()
                     .then(res=>{
                         expect(res).to.be.equal(initialValue + x);
                         done();

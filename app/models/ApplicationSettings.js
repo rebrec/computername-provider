@@ -4,7 +4,7 @@ module.exports = function (db) {
     const moment = require('moment');
 
 
-    class NameProviderConfig {
+    class ApplicationSettings {
         constructor() {
             this.collection = db.config;
         }
@@ -61,5 +61,5 @@ module.exports = function (db) {
         }
 
     }
-    return NameProviderConfig;
+    return ApplicationSettings;
 };

@@ -4,7 +4,7 @@ module.exports = function (db) {
     const app = express();
     const bodyParser = require('body-parser');
     const config = require('../config');
-
+    const GlpiApi = require('./structure/GlpiApi')(db)
     const HostInformation = require('./models/HostInformation')(db);
     const NameProvider = require('./structure/NameProvider')(db);
 
@@ -24,14 +24,20 @@ module.exports = function (db) {
         express: app
     });
 
-    let nameProvider = new NameProvider();
-
+    const glpiApi = new GlpiApi();
+    glpiApi.initSession();
+    const nameProvider = new NameProvider();
+    nameProvider.on('hostCreated', infos =>{
+        console.log('New Host Added !!!');
+        console.log(JSON.stringify(infos));
+        glpiApi.addComputer(infos);
+    });
     const router = express.Router();
     const routerApi = express.Router();
 
     router.route('/')
         .get(function (req, res) {
-            res.render('index.html', {
+            res.render('hostlist.html', {
                 title: 'Computername Provider'
             });
         });
@@ -63,6 +69,21 @@ module.exports = function (db) {
         .get(function (req, res) {
             let result = { status : 'success'};
             nameProvider.getTemplate()
+                .then(data => {
+                    result.data = data;
+                    res.json(result);
+                })
+                .catch(err => {
+                    result.status = 'failure';
+                    result.message = err;
+                    res.json(result);
+                });
+        });
+
+    routerApi.route('/getGlpiSettings')
+        .get(function (req, res) {
+            let result = { status : 'success'};
+            glpiApi.getApiSettings()
                 .then(data => {
                     result.data = data;
                     res.json(result);
@@ -110,6 +131,21 @@ module.exports = function (db) {
             let templateString = req.body.templateString;
             let counter = parseInt(req.body.counter, 10);
             nameProvider.setNewName(templateString, counter)
+                .then(data => {
+                    result.data = data;
+                    res.json(result);
+                })
+                .catch(err => {
+                    result.status = 'failure';
+                    result.message = err;
+                    res.json(result);
+                });
+        });
+
+    routerApi.route('/setGlpiSettings')
+        .put(function (req, res) {
+            let result = { status : 'success'};
+            glpiApi.setApiSettings(req.body)
                 .then(data => {
                     result.data = data;
                     res.json(result);
