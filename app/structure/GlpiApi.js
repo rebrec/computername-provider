@@ -9,11 +9,11 @@ module.exports = function (db) {
         constructor() {
             this.config = new ApplicationSettings();
             this.defaultSettings = {
-                    user: 'someusername',
-                    password: 'somepassword',
-                    hostname: 'www.glpi.corporate.com',
-                    port: '80',
-                    endpoint: '/plugins/webservices/xmlrpc.php'
+                user: 'someusername',
+                password: 'somepassword',
+                hostname: 'www.glpi.corporate.com',
+                port: '80',
+                endpoint: '/plugins/webservices/xmlrpc.php'
             };
             this._client = null;
             this._auth = null;

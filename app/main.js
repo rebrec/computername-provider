@@ -174,6 +174,25 @@ module.exports = function (db) {
         });
 
 
+    routerApi.route('/add_to_glpi')
+        .put(function (req, res) {
+            let result = { status : 'success'};
+            let infos = req.body;
+            console.log('New Host Added !!!');
+            console.log(JSON.stringify(infos));
+            glpiApi.addComputer(infos)
+                .then(data => {
+                    result.data = data;
+                    res.json(result);
+                })
+                .catch(err => {
+                    result.status = 'failure';
+                    result.message = err;
+                    res.json(result);
+                });
+        });
+
+
 
 // all of our routes will be prefixed with /api
     app.use('/', router);

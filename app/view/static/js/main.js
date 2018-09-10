@@ -12,6 +12,7 @@ function main() {
 
     hostDataTable.onRemove              = onRemoveHost;
     hostDataTable.onUpdateBtnClick      = onUpdateForm;
+    hostDataTable.onManualAdd           = onManualAdd;
 
     hostDataTable.setDataSourceURL(config.apiGetComputerlistURL);
 
@@ -80,6 +81,12 @@ function updateSettingStatus() {
 }
 function onUpdateForm(hostObj) {
     api.updateComputerInfos(hostObj)
+        .then(res => {
+            hostDataTable._updateDataSource();
+        });
+}
+function onManualAdd(hostObj) {
+    api.addToGlpi(hostObj)
         .then(res => {
             hostDataTable._updateDataSource();
         });

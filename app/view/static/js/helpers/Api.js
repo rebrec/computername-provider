@@ -34,6 +34,16 @@ class Api {
         });
     }
 
+    addToGlpi(infos) {
+        let url = config.apiAddToGlpiURL;
+        let data = infos;
+        return $.ajax({
+            url: url,
+            type: 'PUT',
+            data: data
+        });
+    }
+
     setTemplate(templateString, counter) {
         let data = {
             templateString: templateString,

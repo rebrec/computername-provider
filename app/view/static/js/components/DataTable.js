@@ -12,6 +12,7 @@ class DataTable {
         };
         this.onUpdateBtnClick = function () {
         };
+        this.onManualAdd = function () {};
         this.onAddTesterClick = function () {
         };
         this._sortedKey = 'hostname'
@@ -179,6 +180,9 @@ class DataTable {
             trBody += '                                <span class="fa fa-refresh datatable-update-btn" title="Modify" data-toggle="modal" data-target="#modalUpdateForm"></span>';
             trBody += '                              </td>';
             trBody += '                              <td>';
+            trBody += '                                <span class="fa fa-arrow-right datatable-manual-add-btn" title="Add To GLPI"></span>';
+            trBody += '                              </td>';
+            trBody += '                              <td>';
             trBody += '                               <span class="fa fa-remove datatable-remove-btn" title="Remove"></span>';
             trBody += '                              </td>';
             trBody += '                           </tr>';
@@ -199,6 +203,7 @@ class DataTable {
         selectNode.on('click', this._onRemoveBtnClick.bind(this));
         $('.datatable-_sort-btn').on('click', this._sortBtnClick.bind(this));
         $('.datatable-update-btn').on('click', this._updateBtnClick.bind(this));
+        $('.datatable-manual-add-btn').on('click', this._manualAddBtnClick.bind(this));
         $('#defaultForm-update-btn').on('click', this._defaultFormUpdateBtnClick.bind(this));
         $('.datable-refresh-btn').on('click', this._updateDataSource.bind(this));
 
@@ -257,6 +262,10 @@ class DataTable {
         $('#defaultForm-serial').val(hostObj.serial);
         $('#defaultForm-hostobj').data('hostobj', hostObj);
         
+    }
+    _manualAddBtnClick(e) {
+        let hostObj = $(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode).data('hostobj');
+        this.onManualAdd(hostObj);
     }
     _defaultFormUpdateBtnClick(e) {
         let hostObj  = $('#defaultForm-hostobj').data('hostobj');
