@@ -85,9 +85,15 @@ function onUpdateForm(hostObj) {
             hostDataTable._updateDataSource();
         });
 }
-function onManualAdd(hostObj) {
+function onManualAdd(e, hostObj) {
     api.addToGlpi(hostObj)
         .then(res => {
-            hostDataTable._updateDataSource();
+            let target = $(e.target)
+            if (!res.status ) target.css('color','red');
+            if (!res.data) target.css('color','red');
+            if (!(res.status === 'success')) target.css('color','red');
+            if (res.data === 'NOT_UPDATED') target.css('color','orange');
+            if (res.data === 'CREATED') target.css('color','green');
+            target.attr('title', res.data);
         });
 }

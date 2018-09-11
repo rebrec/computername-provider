@@ -8,7 +8,7 @@ class DataTable {
         this._datasourceCache = null;
         this.onRemove = function () {
         };
-        this.onRemoveTesterClick = function () {
+        this.onRemoveTesterClick = function () { 
         };
         this.onUpdateBtnClick = function () {
         };
@@ -265,7 +265,7 @@ class DataTable {
     }
     _manualAddBtnClick(e) {
         let hostObj = $(e.target.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode).data('hostobj');
-        this.onManualAdd(hostObj);
+        this.onManualAdd(e, hostObj);
     }
     _defaultFormUpdateBtnClick(e) {
         let hostObj  = $('#defaultForm-hostobj').data('hostobj');

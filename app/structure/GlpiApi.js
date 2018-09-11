@@ -155,6 +155,7 @@ module.exports = function (db) {
                         })
                         .catch((err)=> {
                             console.log('ERROR')
+                            return 'error';
                         })
 
 
