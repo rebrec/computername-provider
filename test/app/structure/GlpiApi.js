@@ -23,26 +23,60 @@ describe('GlpiApi', function () {
     beforeEach(helper.beforeTest);
     afterEach(helper.afterTest);
 
-    it('getTemplateString return a non empty string', function (done) {
+    it('addComputer and _computerExists and removeComputer', function (done) {
         const GlpiApi = GlpiApiFactory(helper.db);
         let glpiApi = new GlpiApi();
-        glpiApi.setApiSettings(settings, {session:'ue8gv2hgsta207edb09eo08r86'})
-            .then( _=> {
+        glpiApi.setApiSettings(settings)
+
+            .then(res => {
+                expect(res).to.be.equal(true);
                 return glpiApi.addComputer({
                     serial: '123456789',
                     hostname: 'testcomputer1'
                 })
             })
-            .then(_=> {
+            .then(res => {
+                expect(res).to.be.an('string');
+                return glpiApi._computerExists(glpiApi._auth, 'testcomputer1')
+            })
+            .then(res => {
+                expect(isNaN(res)).to.be.equal(false);
                 return glpiApi.removeComputer({
                     hostname: 'testcomputer1'
                 })
             })
-            .then(_=> {
-
+            .then(res => {
+                expect(res).to.be.equal('REMOVED');
                 done();
             });
+    });
 
+    it('addComputer and _computerExists and removeComputer', function (done) {
+        const GlpiApi = GlpiApiFactory(helper.db);
+        let glpiApi = new GlpiApi();
+        glpiApi.setApiSettings(settings)
+
+            .then(res => {
+                expect(res).to.be.equal(true);
+                return glpiApi.addComputer({
+                    serial: '123456789',
+                    hostname: 'testcomputer1'
+                })
+            })
+            .then(res => {
+                expect(res).to.be.an('string');
+                return glpiApi._computerExists(glpiApi._auth, 'testcomputer1')
+            })
+            .then(res => {
+                expect(isNaN(res)).to.be.equal(false);
+                return glpiApi.removeComputer({
+                    hostname: 'testcomputer1'
+                })
+            })
+            .then(res => {
+                expect(res).to.be.equal('REMOVED');
+                done();
+            });
     });
 });
 
