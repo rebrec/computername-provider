@@ -20,7 +20,8 @@ class DataTable {
         this._scriptSettings = {testers: []};
         this._columns = [
             {title: 'Serial', property: 'serial'},
-            {title: 'Hostname', property: 'hostname'}
+            {title: 'Hostname', property: 'hostname'},
+            {title: 'TaskSequenceId', property: 'taskSequenceID'}
         ];
         this._patchedColumns = []; //['ipaddresses', 'username']; // columns that will be copied frop additionnalData, to parent object
         this._scriptSettings = {

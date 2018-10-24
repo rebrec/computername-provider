@@ -10,6 +10,8 @@ module.exports = function (db) {
 
     const nunjucks = require('nunjucks');
 
+    const { toXML } = require('jstoxml');
+
     app.use('/vendor/jquery', express.static(config.projectRoot + '/node_modules/jquery/dist/'));
     app.use('/vendor/bootstrap', express.static(config.projectRoot + '/node_modules/bootstrap/dist/'));
     app.use('/vendor/tether', express.static(config.projectRoot + '/node_modules/tether/dist/'));
@@ -34,6 +36,7 @@ module.exports = function (db) {
     });
     const router = express.Router();
     const routerApi = express.Router();
+    const routerApiXML = express.Router();
 
     router.route('/')
         .get(function (req, res) {
@@ -47,6 +50,43 @@ module.exports = function (db) {
                 title: 'Computername Provider (settings)'
             });
         });
+    // Single function which will need to be splitted into a more flexible file/class/whatever
+    routerApi.route('/get_mdt_settings')
+        .get(function (req, res) {
+            let result = {status: 'success'};
+            let serial = req.query.SerialNumber;
+            let model = req.query.Model;
+            let make = req.query.Make;
+            let isVM = req.query.isVM;
+            if (isVM === 'True') {
+                // Handling VM
+                let defaultSettings = {
+                    Computername: 'VM-' + Math.random().toString(36).substring(2, 10), // random name
+                    DomainJoin: 'True',
+                    TaskSequenceId: 'WIN10-X64-1607' // WIN7-X64
+                };
+                // check if data for this host is available in temporary cache
+                    // from the serial we expect to retrieve one or more variables from mdt (which will be used in custom settings.ini ie : OSDComputerName=ComputerName)
+                
+                let settings = Object.assign({}, defaultSettings);
+                res.header('Content-Type', 'text/xml');
+                let xml = toXML({result: settings});
+                return res.send(xml);
+            } else {
+                nameProvider.getHostnameForInfos({serial: serial}) // could later send more data that could be persisted (like OS, cpu,
+                // RAM etc, for now we generate an object containing just the serial property)
+                    .then(data => {
+                        result.data = data;
+                        res.json(result);
+                    })
+                    .catch(err => {
+                        result.status = 'failure';
+                        result.message = err;
+                        res.json(result);
+                    });
+            }
+        });
+
 
     routerApi.route('/get_computer_name')
         .get(function (req, res) {
@@ -109,28 +149,30 @@ module.exports = function (db) {
                     res.json(result);
                 });
         });
-    
-    routerApi.route('/get_template_string')
-        .get(function (req, res) {
-            let result = { status : 'success'};
-            nameProvider.getTemplateString()
-                .then(data => {
-                    result.data = data;
-                    res.json(result);
-                })
-                .catch(err => {
-                    result.status = 'failure';
-                    result.message = err;
-                    res.json(result);
-                });
-        });
+    //
+    // routerApi.route('/get_template_string')
+    //     .get(function (req, res) {
+    //         let result = { status : 'success'};
+    //         nameProvider.getTemplateString()
+    //             .then(data => {
+    //                 result.data = data;
+    //                 res.json(result);
+    //             })
+    //             .catch(err => {
+    //                 result.status = 'failure';
+    //                 result.message = err;
+    //                 res.json(result);
+    //             });
+    //     });
 
     routerApi.route('/set_template_name')
         .put(function (req, res) {
             let result = { status : 'success'};
             let templateString = req.body.templateString;
             let counter = parseInt(req.body.counter, 10);
-            nameProvider.setNewName(templateString, counter)
+            let taskSequenceID = req.body.taskSequenceID;
+            
+            nameProvider.setNewName(templateString, counter, taskSequenceID)
                 .then(data => {
                     result.data = data;
                     res.json(result);

@@ -42,6 +42,10 @@ module.exports = function (db) {
                         return this.getNewName()
                             .then(hostname=> {
                                 infos.hostname = hostname;
+                                return this.config.getDefaultTaskSequenceID();
+                            })
+                            .then(taskSequenceID=> {
+                                infos.taskSequenceID = taskSequenceID;
                                 return this.hostInfo.addHostInformation(infos)
                                     .then(_=>{
                                         this.emit('hostCreated', infos);
@@ -56,6 +60,8 @@ module.exports = function (db) {
 
         getTemplate() {
             let counter;
+            let templateString;
+            let taskSequenceID;
             return Promise.resolve()
                 .then(_=> {
                     return this.config.getCounter();
@@ -66,8 +72,13 @@ module.exports = function (db) {
                     else if (counter < 100) counter = '0' + counter;
                     return this.config.getTemplateString();
                 })
-                .then(templateString=> {
-                    return {templateString: templateString, counter: counter};
+                .then(_=> {
+                    templateString = _;
+                    return this.config.getDefaultTaskSequenceID();
+                })
+                .then(_=> {
+                    taskSequenceID = _;
+                    return {templateString: templateString, counter: counter, taskSequenceID: taskSequenceID};
                 });
         }
 
@@ -94,14 +105,15 @@ module.exports = function (db) {
                 });
         }
 
-        setNewName(templateString, counter) {
+        setNewName(templateString, counter, taskSequenceID) {
             return Promise.resolve()
                 .then(_=> {
                     if (typeof(templateString) !== 'string') throw "templateString must be a string!";
                     if (typeof(counter) !== 'number') throw "counter must be a number!";
                     return Promise.all([
                         this.config.setTemplateString(templateString),
-                        this.config.setCounter(counter)
+                        this.config.setCounter(counter),
+                        this.config.setDefaultTaskSequenceID(taskSequenceID)
                     ]);
                 });
 

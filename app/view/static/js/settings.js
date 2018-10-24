@@ -13,6 +13,7 @@ function loadData() {
         .then(res=> {
             $('#settings-template-string').val(res.templateString);
             $('#settings-counter').val(res.counter);
+            $('#settings-tasksequenceid').val(res.taskSequenceID);
         });
     api.getGlpiSettings()
         .then(apiSettings=> {
@@ -28,6 +29,7 @@ function onSettingsButtonUpdateTemplateClick(e){
     let promises = [];
     let templateString = $('#settings-template-string').val();
     let counter = $('#settings-counter').val();
+    let taskSequenceID = $('#settings-tasksequenceid').val();
 
     let glpiApiUser    = $('#settings-glpi-user').val();
     let glpiApiPassword = $('#settings-glpi-password').val();
@@ -45,7 +47,7 @@ function onSettingsButtonUpdateTemplateClick(e){
 
     if (templateString.length <=0) return showError('Template String must be at least 1 character!');
     if (counter.length <=0) return showError('Counter String must be at least 1 character!');
-    promises.push(api.setTemplate(templateString, counter));
+    promises.push(api.setTemplate(templateString, counter, taskSequenceID));
     promises.push(api.setGlpiSettings(glpiApiSettings));
     Promise.all(promises)
         .then(loadData);

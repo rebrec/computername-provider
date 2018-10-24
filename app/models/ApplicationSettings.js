@@ -60,6 +60,30 @@ module.exports = function (db) {
                 });
         }
 
+
+        getDefaultTaskSequenceID() {
+            return this.collection.findOneAsync({field: 'nameProviderDefaultTaskSequenceID'})
+                .then(res=>{
+                    return (res && res.value) ? res.value : '';
+                });
+        }
+
+
+        setDefaultTaskSequenceID(value) {
+            return Promise.resolve()
+                .then(_=> {
+                    if (!value) throw "Used setDefaultTaskSequenceID with an empty value !"
+                    return this.collection.updateAsync({field: 'nameProviderDefaultTaskSequenceID'},
+                        {
+                            field: 'nameProviderDefaultTaskSequenceID',
+                            value: value
+                        },
+                        {upsert: true}
+                    );
+                });
+        }
+        
+        
     }
     return ApplicationSettings;
 };
