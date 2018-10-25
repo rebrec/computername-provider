@@ -14,7 +14,22 @@ module.exports = function (db) {
         }
 
         getHostList() {
-            return this.hostInfo.listHostInformations();
+            return this.hostInfo.purgeTemporaryHostInformation()
+                .then(_=> {
+                    return this.hostInfo.listHostInformations();
+                });
+        }
+
+        updateTemporaryHostInformation(infos) {
+            return this.hostInfo.updateTemporaryHostInformation(infos)
+                .then(res=>{
+                    this.emit('updateSuccess', infos);
+                    return res;
+                })
+                .catch(err=>{
+                    this.emit('updateFailure', infos, err);
+                    throw err;
+                });
         }
 
 
@@ -31,7 +46,7 @@ module.exports = function (db) {
         }
 
         getHostnameForInfos(infos) {
-            return Promise.resolve()
+            return this.hostInfo.purgeTemporaryHostInformation()
                 .then(_=> {
                     if (!infos) throw 'No Informations provided!!';
                     if (!infos.serial) throw "Information object doesn't have a 'serial' property!!";
@@ -42,10 +57,11 @@ module.exports = function (db) {
                         return this.getNewName()
                             .then(hostname=> {
                                 infos.hostname = hostname;
-                                return this.config.getDefaultTaskSequenceID();
+                                return this.getTemplate();
                             })
-                            .then(taskSequenceID=> {
-                                infos.taskSequenceID = taskSequenceID;
+                            .then(template=> {
+                                infos.taskSequenceID = template.taskSequenceID;
+                                infos.domainJoin = template.domainJoin;
                                 return this.hostInfo.addHostInformation(infos)
                                     .then(_=>{
                                         this.emit('hostCreated', infos);
@@ -62,6 +78,7 @@ module.exports = function (db) {
             let counter;
             let templateString;
             let taskSequenceID;
+            let domainJoin;
             return Promise.resolve()
                 .then(_=> {
                     return this.config.getCounter();
@@ -78,7 +95,11 @@ module.exports = function (db) {
                 })
                 .then(_=> {
                     taskSequenceID = _;
-                    return {templateString: templateString, counter: counter, taskSequenceID: taskSequenceID};
+                    return this.config.getDomainJoin();
+                })
+                .then(_=> {
+                    domainJoin = _;
+                    return {templateString: templateString, counter: counter, taskSequenceID: taskSequenceID, domainJoin: domainJoin};
                 });
         }
 
@@ -105,15 +126,18 @@ module.exports = function (db) {
                 });
         }
 
-        setNewName(templateString, counter, taskSequenceID) {
+        setNewName(templateString, counter, taskSequenceID, domainJoin){
             return Promise.resolve()
                 .then(_=> {
                     if (typeof(templateString) !== 'string') throw "templateString must be a string!";
                     if (typeof(counter) !== 'number') throw "counter must be a number!";
+                    if (typeof(taskSequenceID) !== 'string') throw "taskSequenceID must be a string!";
+                    if (typeof(domainJoin) !== 'string') throw "domainJoin must be a string!";
                     return Promise.all([
                         this.config.setTemplateString(templateString),
                         this.config.setCounter(counter),
-                        this.config.setDefaultTaskSequenceID(taskSequenceID)
+                        this.config.setDefaultTaskSequenceID(taskSequenceID),
+                        this.config.setDomainJoin(domainJoin)
                     ]);
                 });
 

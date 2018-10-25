@@ -68,7 +68,6 @@ module.exports = function (db) {
                 });
         }
 
-
         setDefaultTaskSequenceID(value) {
             return Promise.resolve()
                 .then(_=> {
@@ -82,7 +81,28 @@ module.exports = function (db) {
                     );
                 });
         }
-        
+
+        getDomainJoin() {
+            return this.collection.findOneAsync({field: 'nameProviderDomainJoin'})
+                .then(res=>{
+                    return (res && res.value) ? res.value : '';
+                });
+        }
+
+        setDomainJoin(value) {
+            return Promise.resolve()
+                .then(_=> {
+                    if (!value) throw "Used setDomainJoin with an empty value !"
+                    return this.collection.updateAsync({field: 'nameProviderDomainJoin'},
+                        {
+                            field: 'nameProviderDomainJoin',
+                            value: value
+                        },
+                        {upsert: true}
+                    );
+                });
+        }
+
         
     }
     return ApplicationSettings;

@@ -44,11 +44,12 @@ class Api {
         });
     }
 
-    setTemplate(templateString, counter, taskSequenceID) {
+    setTemplate(templateString, counter, taskSequenceID, domainJoin) {
         let data = {
             templateString: templateString,
             counter: counter,
-            taskSequenceID: taskSequenceID
+            taskSequenceID: taskSequenceID,
+            domainJoin: domainJoin
         };
         let url = this._config.apiSetTemplateNameURL;
         return $.ajax({
