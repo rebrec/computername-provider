@@ -45,7 +45,10 @@ module.exports = function (db) {
                 });
         }
 
-        getHostnameForInfos(infos) {
+        getHostnameForInfos(infos, opt) {
+            opt = opt || { create: true };
+            if (!opt.hasOwnProperty('create')) opt.create = true;
+            
             return this.hostInfo.purgeTemporaryHostInformation()
                 .then(_=> {
                     if (!infos) throw 'No Informations provided!!';
@@ -53,8 +56,7 @@ module.exports = function (db) {
                     return this.hostInfo.serialExists(infos.serial)
                 })
                 .then(exist=> {
-                    if (!exist) {
-                        return this.getNewName()
+                    if (!exist && (opt.create === true)) return this.getNewName()
                             .then(hostname=> {
                                 infos.hostname = hostname;
                                 return this.getTemplate();
@@ -67,7 +69,6 @@ module.exports = function (db) {
                                         this.emit('hostCreated', infos);
                                     })
                             })
-                    }
                 })
                 .then(_=> {
                     return this.hostInfo.getHostInformation(infos.serial);

@@ -4,7 +4,7 @@ module.exports = function (db) {
     const app = express();
     const bodyParser = require('body-parser');
     const config = require('../config');
-    const GlpiApi = require('./structure/GlpiApi')(db)
+    const GlpiApi = require('./structure/GlpiApi')(db);
     const HostInformation = require('./models/HostInformation')(db);
     const NameProvider = require('./structure/NameProvider')(db);
 
@@ -50,42 +50,48 @@ module.exports = function (db) {
                 title: 'Computername Provider (settings)'
             });
         });
-    // Single function which will need to be splitted into a more flexible file/class/whatever
+
+    routerApi.route('/add_temporary_host')
+        .put(function (req, res) {
+            let result = { status : 'success'};
+            let infos = req.body;
+
+            nameProvider.updateTemporaryHostInformation(infos)
+                .then(data => {
+                    result.data = data;
+                    res.json(result);
+                })
+                .catch(err => {
+                    result.status = 'failure';
+                    result.message = err;
+                    res.json(result);
+                });
+        });
+
+    // SAME AS /get_computer_name but could handle specific actions according to defined variables (vm, etc)
+    // Moreover, data is returned as XML And NOT JSON !!!
     routerApi.route('/get_mdt_settings')
         .get(function (req, res) {
-            let result = {status: 'success'};
-            let serial = req.query.SerialNumber;
+            let serial = req.query.Serialnumber;
             let model = req.query.Model;
             let make = req.query.Make;
             let isVM = req.query.isVM;
-            if (isVM === 'True') {
-                // Handling VM
-                let defaultSettings = {
-                    Computername: 'VM-' + Math.random().toString(36).substring(2, 10), // random name
-                    DomainJoin: 'True',
-                    TaskSequenceId: 'WIN10-X64-1607' // WIN7-X64
-                };
-                // check if data for this host is available in temporary cache
-                    // from the serial we expect to retrieve one or more variables from mdt (which will be used in custom settings.ini ie : OSDComputerName=ComputerName)
-                
-                let settings = Object.assign({}, defaultSettings);
-                res.header('Content-Type', 'text/xml');
-                let xml = toXML({result: settings});
-                return res.send(xml);
-            } else {
-                nameProvider.getHostnameForInfos({serial: serial}) // could later send more data that could be persisted (like OS, cpu,
-                // RAM etc, for now we generate an object containing just the serial property)
-                    .then(data => {
-                        result.data = data;
-                        res.json(result);
-                    })
-                    .catch(err => {
-                        result.status = 'failure';
-                        result.message = err;
-                        res.json(result);
-                    });
-            }
+            let result;
+
+            nameProvider.getHostnameForInfos({serial:serial}, {create: false}) // if not found, doesn't create according to template rules
+            // RAM etc, for now we generate an object containing just the serial property)
+                .then(data => {
+                    res.header('Content-Type', 'text/xml');
+                    let xml = toXML({success: data});
+                    return res.send(xml);
+
+                })
+                .catch(err => {
+                    let xml = toXML(result);
+                    return res.send({error: err});
+                });
         });
+
 
 
     routerApi.route('/get_computer_name')
@@ -171,8 +177,9 @@ module.exports = function (db) {
             let templateString = req.body.templateString;
             let counter = parseInt(req.body.counter, 10);
             let taskSequenceID = req.body.taskSequenceID;
-            
-            nameProvider.setNewName(templateString, counter, taskSequenceID)
+            let domainJoin = req.body.domainJoin;
+
+            nameProvider.setNewName(templateString, counter, taskSequenceID, domainJoin)
                 .then(data => {
                     result.data = data;
                     res.json(result);
@@ -214,6 +221,9 @@ module.exports = function (db) {
                     res.json(result);
                 });
         });
+
+
+
 
 
     routerApi.route('/add_to_glpi')

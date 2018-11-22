@@ -67,6 +67,25 @@ module.exports = function (db) {
             return this.updateHostInformation(infos);
         }
 
+        updateTemporaryHostInformation(infos) {
+            let temporaryInformations = Object.assign({}, infos);
+            temporaryInformations.temporary = true;
+            temporaryInformations.creationTime = Date.now();
+            return this.updateHostInformation(temporaryInformations);
+        }
+
+        purgeTemporaryHostInformation(days=0, hours=7, minutes=0, seconds=0) {
+            let timerange = seconds * 1000 + minutes * 60 * 1000 + hours * 60 * 60 * 1000 + days * 24 * 60 * 60 * 1000;
+            let olderTimestamp = Date.now() - timerange;
+            return Promise.resolve()
+                .then(_=>{
+                    return this.collection.removeAsync({ creationTime: { $lt: olderTimestamp }}, { multi: true})
+                })
+                .then(_=>{
+                    console.log(_)
+                });
+        }
+
         updateHostInformation(infos) {
             return Promise.resolve()
                 .then(_=> {
