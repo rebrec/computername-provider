@@ -78,7 +78,8 @@ module.exports = function (db) {
             let isVM = req.query.isVM;
             let result;
 
-            nameProvider.getHostnameForInfos({serial:serial}, {create: false}) // if not found, doesn't create according to template rules
+            // nameProvider.getHostnameForInfos({serial:serial}, {create: false}) // if not found, doesn't create according to template rules
+            nameProvider.getHostnameForInfos({serial:serial}, {create: true}) // if not found, doesn't create according to template rules
             // RAM etc, for now we generate an object containing just the serial property)
                 .then(data => {
                     res.header('Content-Type', 'text/xml');
